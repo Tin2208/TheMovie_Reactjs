@@ -1,0 +1,48 @@
+@import "tailwindcss";
+* {
+  box-sizing: border-box;
+}
+body {
+  line-height: 1.5;
+  min-height: 100vh;
+  overflow-x: hidden;
+  font-family: "Source Sans Pro", Arial, sans-serif;
+  justify-content: center;
+  height: 100%;
+}
+
+.maxPrimaryPageWidth {
+  width: 1300px;
+}
+
+/* Ẩn scrollbar trên tất cả các trình duyệt và loại bỏ border/background */
+
+/* Tùy chỉnh scrollbar */
+.custom-scrollbar {
+  overflow-x: auto;
+}
+
+/* Chrome, Safari, Edge */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px; /* Độ rộng của scrollbar */
+  height: 8px; /* Độ cao của scrollbar ngang */
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent; /* Bỏ background của track */
+  border: none; /* Bỏ border của track */
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #dbdbdb;
+  border-radius: 20px;
+}
+
+@media (max-width: 864px) {
+}
+
+@media (max-width: 700px) {
+}
+
+@media (max-width: 560px) {
+}
