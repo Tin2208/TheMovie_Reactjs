@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom"; // Thêm useLocation
 import Logo from "../assets/logo.svg";
 import { FaPlus } from "react-icons/fa";
 import { IoSearchSharp } from "react-icons/io5";
+import { IoMdTrendingUp } from "react-icons/io";
 
 const Header = () => {
   const [activeMenu, setActiveMenu] = useState(null);
@@ -10,6 +11,9 @@ const Header = () => {
 
   const location = useLocation(); // Lấy đường dẫn hiện tại
   const isMoviePage = location.pathname.startsWith("/movies"); // Kiểm tra nếu trang là Movies
+  const [trendingSearch, setTrendingSearch] = useState([]);
+  const [isSearchQuery, setSearchQuery] = useState(false);
+  const searchRef = useRef(null);
 
   const menus = [
     {
@@ -45,8 +49,38 @@ const Header = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, [activeMenu]);
 
+  useEffect(() => {
+    const fetchTrending = async () => {
+      try {
+        const response = await fetch(
+          "https://api.themoviedb.org/3/trending/all/day?api_key=234e21b8f6a282a6624cf4404219df68&language=vi-VN&page=1"
+        );
+        const data = await response.json();
+        setTrendingSearch(data.results.slice(0, 10));
+      } catch (error) {
+        console.error("Error fetching trending:", error);
+      }
+    };
+    fetchTrending();
+  }, []);
+
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (searchRef.current && !searchRef.current.contains(event.target)) {
+        setSearchQuery(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   return (
-    <div className="fixed top-0 left-0 w-full h-16 bg-[#032541] text-white flex justify-center z-50">
+    <div
+      className={`fixed top-0 left-0 w-full h-16 bg-[#032541] text-white flex justify-center z-50`}
+    >
       <div
         className={`maxPrimaryPageWidth flex items-center justify-between px-10 text-base transition-all duration-300 z-60 ${
           isHeaderVisible
@@ -97,7 +131,7 @@ const Header = () => {
         </div>
 
         <div className="flex items-center justify-center gap-4">
-          <ul className="flex gap-[30px] items-center">
+          <ul className="flex gap-[30px] items-center py-2.5">
             <li>
               <Link to="/add">
                 <FaPlus size="1.4rem" />
@@ -112,10 +146,13 @@ const Header = () => {
             <li>
               <Link to="/join">Tham gia TMDB</Link>
             </li>
-            <li>
-              <Link to="/search">
+            <li className="flex items-center ">
+              <button
+                className="cursor-pointer"
+                onClick={() => setSearchQuery(true)}
+              >
                 <IoSearchSharp size="1.4rem" color="#01b4e4" />
-              </Link>
+              </button>
             </li>
           </ul>
         </div>
@@ -123,19 +160,56 @@ const Header = () => {
 
       {/* Ẩn ô Search bar nếu đang ở trang Movies */}
       {!isMoviePage && (
-        <div
-          className={`w-full absolute left-0 border-t border-b border-[#e3e3e3] flex justify-center bg-white transition-all duration-300 z-40 ${
-            isHeaderVisible ? "top-[64px]" : "top-0"
-          }`}
-        >
-          <div className="flex items-center h-[44px] maxPrimaryPageWidth px-10 relative">
-            <IoSearchSharp size="1.4rem" color="black" />
-            <input
-              type="text"
-              placeholder="Search for a movie, tv show, person..."
-              className="w-full h-full pl-[30px] placeholder:text-[#acacac]"
-            />
+        <div>
+          <div
+            className={`w-full absolute left-0 border-t border-b border-[#e3e3e3] flex justify-center bg-white transition-all duration-300 z-40 ${
+              isHeaderVisible ? "top-[64px]" : "top-0"
+            }`}
+          >
+            <div className=" h-[44px] flex  relative">
+              <div ref={searchRef}>
+                <div className="maxPrimaryPageWidth px-10 flex items-center h-full">
+                  <IoSearchSharp size="1.4rem" color="black" />
+                  <input
+                    type="text"
+                    placeholder="Search for a movie, tv show, person..."
+                    className="w-full outline-none text-black h-full pl-[30px] placeholder:text-[#acacac]"
+                    onFocus={() => setSearchQuery(true)}
+                  />
+                </div>
+              </div>
+            </div>
           </div>
+          {isSearchQuery && (
+            <div>
+              <div className=" bg-[#f7f7f7] w-full absolute left-0 top-[110px] flex justify-center">
+                <div className="flex items-center gap-1.5 py-[10px] border-b border-[#e3e3e3] px-10  maxPrimaryPageWidth">
+                  <IoMdTrendingUp color="black" />
+                  <span className="text-[1.2em] font-bold text-black">
+                    Trending
+                  </span>
+                </div>
+              </div>
+              <div className="bg-white w-full absolute left-0 top-[154px] flex justify-center">
+                <ul className="flex  flex-col py-[10px] border-b border-[#e3e3e3] px-10  maxPrimaryPageWidth">
+                  {trendingSearch.map((item) => {
+                    return (
+                      <li
+                        key={item.id}
+                        className="flex items-center gap-1.5 !w-full border-b border-[#e3e3e3] pt-[4px] pb-[5px] cursor-pointer hover:bg-[#dee2e6]"
+                        onClick={() => setSearchQuery(false)}
+                      >
+                        <IoSearchSharp size="1rem" color="black" />
+                        <span className="text-black">
+                          {item.title || item.name}
+                        </span>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>

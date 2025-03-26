@@ -12,6 +12,7 @@ const Popular = () => {
   const fetchPopularTVShows = async () => {
     try {
       const endpoint = `https://api.themoviedb.org/3/tv/popular?api_key=234e21b8f6a282a6624cf4404219df68&language=vi-VN&page=1`;
+
       const response = await fetch(endpoint);
       const data = await response.json();
       setItems(data.results || []);
@@ -70,9 +71,9 @@ const Popular = () => {
 
   return (
     <div className="relative flex justify-center w-full ">
-      <div className="overflow-x-auto scroll-smooth custom-scrollbar py-6 ">
+      <div className="">
         <div className="maxPrimaryPageWidth pl-10 relative">
-          <div className="flex items-center gap-5">
+          <div className="flex items-center gap-5 pt-[30px]">
             <h2 className="text-2xl font-semibold">Popular</h2>
             <div className="flex items-center border border-[#032541] rounded-full cursor-pointer">
               <button
@@ -92,7 +93,7 @@ const Popular = () => {
 
           <div
             ref={scrollRef}
-            className="pt-5 flex gap-4  whitespace-nowrap  relative"
+            className="pt-5 pb-[30px] flex gap-4  whitespace-nowrap overflow-x-auto scroll-smooth custom-scrollbar  relative"
           >
             {items.map((item) => (
               <div
@@ -121,7 +122,7 @@ const Popular = () => {
                 {/* Điểm đánh giá - Circular Progress */}
                 <div
                   className={`absolute left-2 w-[40px] h-[40px] bg-[#081c22] p-[3px] rounded-full flex items-center justify-center ${
-                    isInTheaters ? "bottom-25" : "bottom-20"
+                    isInTheaters ? "bottom-25" : "bottom-25"
                   }`}
                 >
                   {item.vote_average === 0 ? (

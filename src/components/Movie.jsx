@@ -62,7 +62,6 @@ const Movie = () => {
 
   return (
     <div>
-      <Header />
       <div className="mt-[64px] flex justify-center p-[30px] px-[40px]">
         <div className="movie-page maxPrimaryPageWidth">
           <div className="pb-[20px]">
@@ -84,6 +83,9 @@ const Movie = () => {
                       <h2>Filters</h2>
                       <span className="font-bold">
                         <MdNavigateNext size={24} />
+                      </span>
+                      <span>
+                        <MdKeyboardArrowDown />
                       </span>
                     </div>
                   </div>

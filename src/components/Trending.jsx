@@ -58,12 +58,12 @@ const Trending = () => {
 
   return (
     <div className="relative  flex justify-center w-full">
-      <div className="overflow-x-auto scroll-smooth custom-scrollbar py-6">
+      <div className=" ">
         <div
           className="maxPrimaryPageWidth pl-10 relative bg-no-repeat bg-[50%_200px]"
           style={{ backgroundImage: `url(${bgTrending})` }}
         >
-          <div className="flex items-center gap-5">
+          <div className="flex items-center gap-5 pt-[30px]">
             <h2 className="text-2xl font-semibold">Trending</h2>
             <div className="relative flex items-center border border-[#032541] rounded-full cursor-pointer">
               <div
@@ -94,7 +94,7 @@ const Trending = () => {
           </div>
           <div
             ref={scrollRef}
-            className="pt-5 flex gap-4  whitespace-nowrap  relative"
+            className="pt-5 pb-[30px] flex gap-4  whitespace-nowrap overflow-x-auto scroll-smooth custom-scrollbar  relative"
           >
             {trendingMovies.map((movie) => (
               <div
