@@ -1,16 +1,19 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Link, useLocation } from "react-router-dom"; // Thêm useLocation
-import Logo from "../assets/logo.svg";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import Logo from "../assets/Icons/Logo.svg";
 import { FaPlus } from "react-icons/fa";
 import { IoSearchSharp } from "react-icons/io5";
 import { IoMdTrendingUp } from "react-icons/io";
+import { fetchTrendingMovies } from "../api/MovieApi";
 
 const Header = () => {
   const [activeMenu, setActiveMenu] = useState(null);
   const [isHeaderVisible, setIsHeaderVisible] = useState(true);
-
-  const location = useLocation(); // Lấy đường dẫn hiện tại
-  const isMoviePage = location.pathname.startsWith("/movies"); // Kiểm tra nếu trang là Movies
+  const [searchTerm, setSearchTerm] = useState("");
+  const navigate = useNavigate();
+  const location = useLocation();
+  const isMoviePage = location.pathname.startsWith("/movies");
+  const isTVPage = location.pathname.startsWith("/tv");
   const [trendingSearch, setTrendingSearch] = useState([]);
   const [isSearchQuery, setSearchQuery] = useState(false);
   const searchRef = useRef(null);
@@ -23,8 +26,8 @@ const Header = () => {
     },
     {
       title: "TV Shows",
-      path: "/tv-shows",
-      options: ["Popular", "Now Playing", "Upcoming", "Top Rated"],
+      path: "/tv",
+      options: ["Popular", "Airing Today", "On The Air", "Top Rated"],
     },
     { title: "People", path: "/people", options: ["Popular People"] },
     {
@@ -52,13 +55,10 @@ const Header = () => {
   useEffect(() => {
     const fetchTrending = async () => {
       try {
-        const response = await fetch(
-          "https://api.themoviedb.org/3/trending/all/day?api_key=234e21b8f6a282a6624cf4404219df68&language=vi-VN&page=1"
-        );
-        const data = await response.json();
-        setTrendingSearch(data.results.slice(0, 10));
+        const trendingData = await fetchTrendingMovies("day"); // Gọi hàm fetchTrendingMovies
+        setTrendingSearch(trendingData.slice(0, 10)); // Lấy 10 kết quả đầu tiên
       } catch (error) {
-        console.error("Error fetching trending:", error);
+        console.error("Lỗi khi lấy dữ liệu trending:", error.message);
       }
     };
     fetchTrending();
@@ -68,14 +68,35 @@ const Header = () => {
     function handleClickOutside(event) {
       if (searchRef.current && !searchRef.current.contains(event.target)) {
         setSearchQuery(false);
+      } else {
+        console.log("Click trong khu vực tìm kiếm, giữ dropdown");
       }
     }
 
     document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  const handleSearch = (e) => {
+    if (e.key === "Enter" && searchTerm.trim()) {
+      navigate(`/search?query=${encodeURIComponent(searchTerm)}`);
+      setSearchQuery(false);
+    }
+  };
+
+  const handleTrendingClick = (term) => {
+    if (!term) {
+      return;
+    }
+    setSearchTerm(term);
+    setSearchQuery(false);
+    const searchUrl = `/search?query=${encodeURIComponent(term)}`;
+    navigate(searchUrl);
+  };
+
+  const openSearch = () => {
+    setSearchQuery(true);
+  };
 
   return (
     <div
@@ -101,7 +122,13 @@ const Header = () => {
                 onMouseEnter={() => setActiveMenu(menu.title)}
                 onMouseLeave={() => setActiveMenu(null)}
               >
-                <Link to={menu.path}>{menu.title}</Link>
+                {menu.title === "Movies" ||
+                menu.title === "TV Shows" ||
+                menu.title === "People" ? (
+                  <span>{menu.title}</span>
+                ) : (
+                  <Link to={menu.path}>{menu.title}</Link>
+                )}
                 {activeMenu === menu.title && (
                   <ul
                     className="absolute left-0 mt-2 bg-white text-black rounded-md shadow-lg w-max py-1 z-60"
@@ -117,7 +144,7 @@ const Header = () => {
                         <Link
                           to={`${menu.path}/${option
                             .toLowerCase()
-                            .replace(" ", "-")}`}
+                            .replace(/\s+/g, "-")}`}
                         >
                           {option}
                         </Link>
@@ -146,11 +173,8 @@ const Header = () => {
             <li>
               <Link to="/join">Tham gia TMDB</Link>
             </li>
-            <li className="flex items-center ">
-              <button
-                className="cursor-pointer"
-                onClick={() => setSearchQuery(true)}
-              >
+            <li className="flex items-center">
+              <button className="cursor-pointer" onClick={openSearch}>
                 <IoSearchSharp size="1.4rem" color="#01b4e4" />
               </button>
             </li>
@@ -158,54 +182,63 @@ const Header = () => {
         </div>
       </div>
 
-      {/* Ẩn ô Search bar nếu đang ở trang Movies */}
-      {!isMoviePage && (
-        <div>
+      {!(isMoviePage || isTVPage) && (
+        <div ref={searchRef}>
           <div
             className={`w-full absolute left-0 border-t border-b border-[#e3e3e3] flex justify-center bg-white transition-all duration-300 z-40 ${
               isHeaderVisible ? "top-[64px]" : "top-0"
             }`}
           >
-            <div className=" h-[44px] flex  relative">
-              <div ref={searchRef}>
-                <div className="maxPrimaryPageWidth px-10 flex items-center h-full">
-                  <IoSearchSharp size="1.4rem" color="black" />
-                  <input
-                    type="text"
-                    placeholder="Search for a movie, tv show, person..."
-                    className="w-full outline-none text-black h-full pl-[30px] placeholder:text-[#acacac]"
-                    onFocus={() => setSearchQuery(true)}
-                  />
-                </div>
+            <div className="h-[44px] flex relative">
+              <div className="maxPrimaryPageWidth px-10 flex items-center h-full">
+                <IoSearchSharp size="1.4rem" color="black" />
+                <input
+                  type="text"
+                  placeholder="Tìm kiếm phim, chương trình TV, người..."
+                  className="w-full outline-none text-black h-full pl-[30px] placeholder:text-[#acacac]"
+                  onFocus={() => setSearchQuery(true)}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  onKeyDown={handleSearch}
+                  value={searchTerm}
+                />
               </div>
             </div>
           </div>
           {isSearchQuery && (
             <div>
-              <div className=" bg-[#f7f7f7] w-full absolute left-0 top-[110px] flex justify-center">
-                <div className="flex items-center gap-1.5 py-[10px] border-b border-[#e3e3e3] px-10  maxPrimaryPageWidth">
+              <div className="bg-[#f7f7f7] w-full absolute left-0 top-[110px] flex justify-center z-50">
+                <div className="flex items-center gap-1.5 py-[10px] border-b border-[#e3e3e3] px-10 maxPrimaryPageWidth">
                   <IoMdTrendingUp color="black" />
                   <span className="text-[1.2em] font-bold text-black">
                     Trending
                   </span>
                 </div>
               </div>
-              <div className="bg-white w-full absolute left-0 top-[154px] flex justify-center">
-                <ul className="flex  flex-col py-[10px] border-b border-[#e3e3e3] px-10  maxPrimaryPageWidth">
-                  {trendingSearch.map((item) => {
-                    return (
+              <div className="bg-white w-full absolute left-0 top-[154px] flex justify-center z-50">
+                <ul className="flex flex-col py-[10px] border-b border-[#e3e3e3] px-10 maxPrimaryPageWidth">
+                  {trendingSearch.length > 0 ? (
+                    trendingSearch.map((item) => (
                       <li
                         key={item.id}
                         className="flex items-center gap-1.5 !w-full border-b border-[#e3e3e3] pt-[4px] pb-[5px] cursor-pointer hover:bg-[#dee2e6]"
-                        onClick={() => setSearchQuery(false)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          console.log(
+                            "Nhấp vào item:",
+                            item.title || item.name
+                          );
+                          handleTrendingClick(item.title || item.name);
+                        }}
                       >
                         <IoSearchSharp size="1rem" color="black" />
                         <span className="text-black">
-                          {item.title || item.name}
+                          {item.title || item.name || "Không có tiêu đề"}
                         </span>
                       </li>
-                    );
-                  })}
+                    ))
+                  ) : (
+                    <li className="text-black">Không có dữ liệu trending</li>
+                  )}
                 </ul>
               </div>
             </div>

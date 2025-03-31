@@ -2,7 +2,8 @@ import React, { useEffect, useState, useRef } from "react";
 import { HiMiniEllipsisHorizontalCircle } from "react-icons/hi2";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
-import bgTrending from "../assets/bgTrending.svg";
+import bgTrending from "../assets/Image/bgTrending.svg";
+import { fetchTrendingMovies } from "../api/MovieApi";
 
 const Trending = () => {
   const [trendingMovies, setTrendingMovies] = useState([]);
@@ -10,39 +11,30 @@ const Trending = () => {
   const scrollRef = useRef(true);
   const [timeWindow, setTimeWindow] = useState("day");
 
-  const fetchTrendingMovies = async (window) => {
-    try {
-      const response = await fetch(
-        `https://api.themoviedb.org/3/trending/movie/${window}?api_key=234e21b8f6a282a6624cf4404219df68&language=vi-VN&page=1`
-      );
-      const data = await response.json();
-      setTrendingMovies(data.results);
-    } catch (error) {
-      console.error("Error fetching trending movies:", error);
-    }
-  };
-
   useEffect(() => {
-    fetchTrendingMovies(timeWindow);
+    const getTrendingMovies = async () => {
+      try {
+        const movies = await fetchTrendingMovies(timeWindow);
+        setTrendingMovies(movies);
+      } catch (error) {
+        console.error("Error fetching trending movies:", error);
+      }
+    };
+
+    getTrendingMovies();
   }, [timeWindow]);
 
   useEffect(() => {
     const handleScroll = () => {
       if (scrollRef.current) {
         const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
-        if (scrollLeft > 100) {
-          setIsGradientVisible(false); // Ẩn gradient khi cuộn quá 100px
-        } else {
-          // Hiển thị gradient khi ở vị trí ban đầu hoặc chưa cuộn hết
-          setIsGradientVisible(scrollLeft + clientWidth < scrollWidth - 0);
-        }
+        setIsGradientVisible(scrollLeft + clientWidth < scrollWidth - 0);
       }
     };
 
     const scrollElement = scrollRef.current;
     if (scrollElement) {
       scrollElement.addEventListener("scroll", handleScroll);
-      // handleScroll(); // Gọi ngay để kiểm tra trạng thái ban đầu khi render
     }
 
     return () => {
@@ -57,8 +49,8 @@ const Trending = () => {
   };
 
   return (
-    <div className="relative  flex justify-center w-full">
-      <div className=" ">
+    <div className="relative flex justify-center w-full">
+      <div>
         <div
           className="maxPrimaryPageWidth pl-10 relative bg-no-repeat bg-[50%_200px]"
           style={{ backgroundImage: `url(${bgTrending})` }}
@@ -94,7 +86,7 @@ const Trending = () => {
           </div>
           <div
             ref={scrollRef}
-            className="pt-5 pb-[30px] flex gap-4  whitespace-nowrap overflow-x-auto scroll-smooth custom-scrollbar  relative"
+            className="pt-5 pb-[30px] flex gap-4 whitespace-nowrap overflow-x-auto scroll-smooth custom-scrollbar relative"
           >
             {trendingMovies.map((movie) => (
               <div
@@ -118,7 +110,7 @@ const Trending = () => {
                     className="text-[#a7b5b9] hover:text-[#01b4e5]"
                   />
                 </div>
-                <div className="absolute bottom-20 left-2 w-[40px] h-[40px] bg-[#081c22] p-[3px] rounded-full">
+                <div className="absolute bottom-30 left-2 w-[40px] h-[40px] bg-[#081c22] p-[3px] rounded-full">
                   {movie.vote_average === 0 ? (
                     <span className="text-white text-xs font-bold">NR</span>
                   ) : (

@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { HiMiniEllipsisHorizontalCircle } from "react-icons/hi2";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import "react-circular-progressbar/dist/styles.css";
+import { fetchMovies } from "../api/movieApi"; // Import hàm fetchMovies
 
 const Popular = () => {
   const [items, setItems] = useState([]);
@@ -11,11 +12,9 @@ const Popular = () => {
 
   const fetchPopularTVShows = async () => {
     try {
-      const endpoint = `https://api.themoviedb.org/3/tv/popular?api_key=234e21b8f6a282a6624cf4404219df68&language=vi-VN&page=1`;
-
-      const response = await fetch(endpoint);
-      const data = await response.json();
-      setItems(data.results || []);
+      const endpoint = "/tv/popular"; // Điều chỉnh endpoint theo movieApi
+      const data = await fetchMovies(endpoint);
+      setItems(data || []);
     } catch (error) {
       console.error("Error fetching popular TV shows:", error);
       setItems([]);
@@ -24,10 +23,9 @@ const Popular = () => {
 
   const fetchMoviesInTheaters = async () => {
     try {
-      const endpoint = `https://api.themoviedb.org/3/movie/now_playing?api_key=234e21b8f6a282a6624cf4404219df68&region=VN&language=vi-VN&page=1`;
-      const response = await fetch(endpoint);
-      const data = await response.json();
-      setItems(data.results || []);
+      const endpoint = "/movie/now_playing"; // Điều chỉnh endpoint theo movieApi
+      const data = await fetchMovies(endpoint);
+      setItems(data || []);
     } catch (error) {
       console.error("Error fetching movies in theaters:", error);
       setItems([]);
@@ -77,7 +75,7 @@ const Popular = () => {
             <h2 className="text-2xl font-semibold">Popular</h2>
             <div className="flex items-center border border-[#032541] rounded-full cursor-pointer">
               <button
-                className={`px-5 py-1 rounded-full transition-colors duration-300 ease-in-out ${
+                className={`px-5 py-1 rounded-full transition-colors duration-300 ease-in-out cursor-pointer ${
                   isInTheaters
                     ? "bg-[#032541] text-[#71eabc]"
                     : "bg-[#032541] text-[#032541]"
@@ -93,7 +91,7 @@ const Popular = () => {
 
           <div
             ref={scrollRef}
-            className="pt-5 pb-[30px] flex gap-4  whitespace-nowrap overflow-x-auto scroll-smooth custom-scrollbar  relative"
+            className="pt-5 pb-[30px] flex gap-4 whitespace-nowrap overflow-x-auto scroll-smooth custom-scrollbar relative"
           >
             {items.map((item) => (
               <div

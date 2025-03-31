@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const HeroSection = () => {
   const [backgroundImage, setBackgroundImage] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchMovies = async () => {
@@ -25,6 +28,12 @@ const HeroSection = () => {
     fetchMovies();
   }, []);
 
+  const handleSearch = (e) => {
+    if (e.key === "Enter" && searchTerm.trim() !== "") {
+      navigate(`/search?query=${searchTerm}`);
+    }
+  };
+
   return (
     <div
       className="mt-[110px] w-full flex justify-center bg-no-repeat bg-cover bg-center"
@@ -44,8 +53,17 @@ const HeroSection = () => {
             type="text"
             placeholder="Search for a movie, tv show, person..."
             className="w-full h-full pl-[30px] placeholder:text-[#acacac] outline-none"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            onKeyDown={handleSearch}
           />
-          <span className="h-[46px] cursor-pointer px-[26px] py-[10px] border-0 bg-gradient-to-r from-[#1ed5a9] to-[#01b4e4] rounded-[30px] hover:text-[#032541]  text-white">
+          <span
+            className="h-[46px] cursor-pointer px-[26px] py-[10px] border-0 bg-gradient-to-r from-[#1ed5a9] to-[#01b4e4] rounded-[30px] hover:text-[#032541]  text-white"
+            onClick={() =>
+              searchTerm.trim() &&
+              navigate(`/search?query=${encodeURIComponent(searchTerm)}`)
+            }
+          >
             Search
           </span>
         </div>
