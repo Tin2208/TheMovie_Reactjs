@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { HiMiniEllipsisHorizontalCircle } from "react-icons/hi2";
 import { FaPlay } from "react-icons/fa";
 import { IoClose } from "react-icons/io5";
-import { fetchMovies } from "../api/movieApi"; // Import hàm fetchMovies
+import { fetchMovies } from "../api/MovieApi"; // Import hàm fetchMovies
 
 const Trailer = () => {
   const [trailerMovies, setTrailerMovies] = useState([]);
@@ -86,7 +86,7 @@ const Trailer = () => {
       }}
     >
       <div className="max-w-[1300px] relative">
-        <div className="flex items-center pt-[30px]">
+        <div className="flex items-center pt-[30px] pl-10">
           <h2 className="text-[24px] mr-5 text-white font-semibold">
             Latest Trailers
           </h2>
@@ -118,11 +118,11 @@ const Trailer = () => {
 
         <div
           ref={scrollRef}
-          className="pt-5 flex gap-5 scroll-smooth custom-scrollbar overflow-x-auto pb-[30px] relative"
+          className="pt-5 flex gap-5 scroll-smooth custom-scrollbar overflow-x-auto pb-[30px] relative  "
         >
           {trailerMovies.map((movie) => (
             <div
-              className="relative inline-block min-w-[300px] ml-10"
+              className="relative inline-block min-w-[300px] "
               key={movie.id}
               onMouseEnter={() => {
                 if (movie.backdrop_path || movie.poster_path) {
@@ -138,12 +138,12 @@ const Trailer = () => {
                   <img
                     src={`https://image.tmdb.org/t/p/w500${movie.poster_path}`}
                     alt={movie.title}
-                    className="flex-shrink-0 object-cover rounded-lg w-full h-[calc(300px/1.78)]"
+                    className="flex-shrink-0 object-cover rounded-lg w-full h-[calc(300px/1.78)] mx-10"
                   />
                   <FaPlay
                     color="white"
                     size={40}
-                    className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 scale-120 hover:scale-120 transition-transform duration-300"
+                    className="absolute top-1/2 left-[calc(1/1.5*100%)] transform -translate-x-1/2 -translate-y-1/2 scale-130 hover:scale-130 transition-transform duration-300"
                   />
                   <div className="absolute top-[8px] right-[8px] cursor-pointer">
                     <HiMiniEllipsisHorizontalCircle

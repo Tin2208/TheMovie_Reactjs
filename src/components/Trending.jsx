@@ -27,8 +27,8 @@ const Trending = () => {
   useEffect(() => {
     const handleScroll = () => {
       if (scrollRef.current) {
-        const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
-        setIsGradientVisible(scrollLeft + clientWidth < scrollWidth - 0);
+        const { scrollLeft } = scrollRef.current;
+        setIsGradientVisible(scrollLeft < 100);
       }
     };
 
@@ -52,7 +52,7 @@ const Trending = () => {
     <div className="relative flex justify-center w-full">
       <div>
         <div
-          className="maxPrimaryPageWidth pl-10 relative bg-no-repeat bg-[50%_200px]"
+          className="maxPrimaryPageWidth  relative bg-no-repeat bg-[50%_200px]"
           style={{ backgroundImage: `url(${bgTrending})` }}
         >
           <div className="flex items-center gap-5 pt-[30px]">
@@ -86,7 +86,7 @@ const Trending = () => {
           </div>
           <div
             ref={scrollRef}
-            className="pt-5 pb-[30px] flex gap-4 whitespace-nowrap overflow-x-auto scroll-smooth custom-scrollbar relative"
+            className="pt-5 pb-[30px] pl-10 flex gap-4 whitespace-nowrap overflow-x-auto scroll-smooth custom-scrollbar relative"
           >
             {trendingMovies.map((movie) => (
               <div
@@ -110,7 +110,7 @@ const Trending = () => {
                     className="text-[#a7b5b9] hover:text-[#01b4e5]"
                   />
                 </div>
-                <div className="absolute bottom-30 left-2 w-[40px] h-[40px] bg-[#081c22] p-[3px] rounded-full">
+                <div className="absolute top-50 left-2 w-[40px] h-[40px] bg-[#081c22] p-[3px] rounded-full">
                   {movie.vote_average === 0 ? (
                     <span className="text-white text-xs font-bold">NR</span>
                   ) : (

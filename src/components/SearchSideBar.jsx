@@ -17,7 +17,7 @@ const SearchSideBar = () => {
   const query = new URLSearchParams(location.search).get("query") || "";
 
   return (
-    <div className="min-w-[260px] w-full flex flex-col gap-5">
+    <div className="max-w-[260px] w-full flex flex-col gap-5">
       <div className="border border-[#e3e3e3] rounded-lg flex flex-col">
         <h3 className="bg-[#01b4e4] font-semibold p-5 text-white text-[1.2em] rounded-t-lg">
           Search Results
@@ -39,7 +39,7 @@ const SearchSideBar = () => {
                 >
                   {category.title}
                 </Link>
-                <span>0</span> 
+                <span>0</span>
               </li>
             ))}
           </ul>

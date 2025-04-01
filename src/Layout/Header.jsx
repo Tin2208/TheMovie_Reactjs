@@ -16,17 +16,18 @@ const Header = () => {
   const isTVPage = location.pathname.startsWith("/tv");
   const [trendingSearch, setTrendingSearch] = useState([]);
   const [isSearchQuery, setSearchQuery] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const searchRef = useRef(null);
 
   const menus = [
     {
       title: "Movies",
-      path: "/movies",
+      path: "",
       options: ["Popular", "Now Playing", "Upcoming", "Top Rated"],
     },
     {
       title: "TV Shows",
-      path: "/tv",
+      path: "",
       options: ["Popular", "Airing Today", "On The Air", "Top Rated"],
     },
     { title: "People", path: "/people", options: ["Popular People"] },
@@ -51,6 +52,26 @@ const Header = () => {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, [activeMenu]);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollPosition =
+        window.scrollY || document.documentElement.scrollTop;
+      setIsScrolled(scrollPosition > 0);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setSearchQuery(false); // Ẩn dropdown khi cuộn
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   useEffect(() => {
     const fetchTrending = async () => {
@@ -100,7 +121,9 @@ const Header = () => {
 
   return (
     <div
-      className={`fixed top-0 left-0 w-full h-16 bg-[#032541] text-white flex justify-center z-50`}
+      className={`fixed top-0 left-0 w-full ${
+        isScrolled ? "h-11" : "h-16"
+      } bg-[#032541] text-white flex justify-center z-50`}
     >
       <div
         className={`maxPrimaryPageWidth flex items-center justify-between px-10 text-base transition-all duration-300 z-60 ${
@@ -111,7 +134,7 @@ const Header = () => {
         style={{ zIndex: 60 }}
       >
         <div className="flex items-center">
-          <Link to="/">
+          <Link to="/" onClick={() => setSearchTerm("")}>
             <img className="mr-4" src={Logo} alt="Logo" />
           </Link>
           <ul className="flex gap-[30px]">
@@ -145,6 +168,7 @@ const Header = () => {
                           to={`${menu.path}/${option
                             .toLowerCase()
                             .replace(/\s+/g, "-")}`}
+                          onClick={() => setSearchTerm("")}
                         >
                           {option}
                         </Link>
@@ -185,17 +209,17 @@ const Header = () => {
       {!(isMoviePage || isTVPage) && (
         <div ref={searchRef}>
           <div
-            className={`w-full absolute left-0 border-t border-b border-[#e3e3e3] flex justify-center bg-white transition-all duration-300 z-40 ${
+            className={`w-full absolute left-0 border-t border-b border-[#e3e3e3] flex  bg-white transition-all duration-300 z-40 ${
               isHeaderVisible ? "top-[64px]" : "top-0"
             }`}
           >
-            <div className="h-[44px] flex relative">
-              <div className="maxPrimaryPageWidth px-10 flex items-center h-full">
+            <div className="h-[44px] flex relative w-full">
+              <div className="px-10 flex items-center w-full">
                 <IoSearchSharp size="1.4rem" color="black" />
                 <input
                   type="text"
                   placeholder="Tìm kiếm phim, chương trình TV, người..."
-                  className="w-full outline-none text-black h-full pl-[30px] placeholder:text-[#acacac]"
+                  className="flex-1 outline-none text-black h-full pl-[30px] placeholder:text-[#acacac]"
                   onFocus={() => setSearchQuery(true)}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   onKeyDown={handleSearch}
@@ -206,34 +230,40 @@ const Header = () => {
           </div>
           {isSearchQuery && (
             <div>
-              <div className="bg-[#f7f7f7] w-full absolute left-0 top-[110px] flex justify-center z-50">
+              <div
+                className={`bg-[#f7f7f7] w-full absolute left-0 ${
+                  isScrolled ? "top-[44px]" : "top-[110px]"
+                } flex justify-center z-50 `}
+              >
                 <div className="flex items-center gap-1.5 py-[10px] border-b border-[#e3e3e3] px-10 maxPrimaryPageWidth">
                   <IoMdTrendingUp color="black" />
-                  <span className="text-[1.2em] font-bold text-black">
+                  <span className="text-[1.2em] leading-[1.2em] font-bold text-black ">
                     Trending
                   </span>
                 </div>
               </div>
-              <div className="bg-white w-full absolute left-0 top-[154px] flex justify-center z-50">
-                <ul className="flex flex-col py-[10px] border-b border-[#e3e3e3] px-10 maxPrimaryPageWidth">
+              <div
+                className={`bg-white w-full absolute left-0 ${
+                  isScrolled ? "top-[88px]" : "top-[154px]"
+                } flex justify-center z-50`}
+              >
+                <ul className="flex flex-col   border-[#e3e3e3]   relative">
                   {trendingSearch.length > 0 ? (
                     trendingSearch.map((item) => (
                       <li
                         key={item.id}
-                        className="flex items-center gap-1.5 !w-full border-b border-[#e3e3e3] pt-[4px] pb-[5px] cursor-pointer hover:bg-[#dee2e6]"
+                        className="flex justify-center  gap-1.5 w-screen border-b border-[#e3e3e3] pt-[4px] pb-[5px] cursor-pointer hover:bg-[#dee2e6] "
                         onClick={(e) => {
                           e.stopPropagation();
-                          console.log(
-                            "Nhấp vào item:",
-                            item.title || item.name
-                          );
                           handleTrendingClick(item.title || item.name);
                         }}
                       >
-                        <IoSearchSharp size="1rem" color="black" />
-                        <span className="text-black">
-                          {item.title || item.name || "Không có tiêu đề"}
-                        </span>
+                        <div className="maxPrimaryPageWidth flex px-10 items-center gap-1.5 ">
+                          <IoSearchSharp size="1rem" color="black" />
+                          <span className="text-black text-[14.4px] ">
+                            {item.title || item.name || "Không có tiêu đề"}
+                          </span>
+                        </div>
                       </li>
                     ))
                   ) : (

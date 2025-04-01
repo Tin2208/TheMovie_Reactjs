@@ -69,7 +69,7 @@ const TVShowList = ({ endpoint, title }) => {
                 className="text-[#a7b5b9] hover:text-[#01b4e5]"
               />
             </div>
-            <div className="absolute bottom-20 left-2 w-[40px] h-[40px] bg-[#081c22] p-[3px] rounded-full">
+            <div className="absolute top-63 left-2 w-[40px] h-[40px] bg-[#081c22] p-[3px] rounded-full">
               {show.vote_average === 0 ? (
                 <span className="text-white text-xs font-bold flex items-center justify-center h-full">
                   NR

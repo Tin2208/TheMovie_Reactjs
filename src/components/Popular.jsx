@@ -70,7 +70,7 @@ const Popular = () => {
   return (
     <div className="relative flex justify-center w-full ">
       <div className="">
-        <div className="maxPrimaryPageWidth pl-10 relative">
+        <div className="maxPrimaryPageWidth  relative">
           <div className="flex items-center gap-5 pt-[30px]">
             <h2 className="text-2xl font-semibold">Popular</h2>
             <div className="flex items-center border border-[#032541] rounded-full cursor-pointer">
@@ -91,7 +91,7 @@ const Popular = () => {
 
           <div
             ref={scrollRef}
-            className="pt-5 pb-[30px] flex gap-4 whitespace-nowrap overflow-x-auto scroll-smooth custom-scrollbar relative"
+            className="pt-5 pb-[30px] pl-10 flex gap-4 whitespace-nowrap overflow-x-auto scroll-smooth custom-scrollbar relative"
           >
             {items.map((item) => (
               <div

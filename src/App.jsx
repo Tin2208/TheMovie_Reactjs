@@ -9,21 +9,29 @@ import Search from "./pages/Search";
 import Peoples from "./pages/People";
 
 function App() {
+  const moviesRoute = ["popular", "now-playing", "upcoming", "top-rated"];
+  const tvShowsRoute = ["popular", "airing-today", "on-the-air", "top-rated"];
   return (
     <BrowserRouter>
       <Header />
       <Routes>
         <Route path="/" element={<Container />} />
-        <Route path="/movies/popular" element={<Movie />} />
-        <Route path="/movies/now-playing" element={<Movie />} />
-        <Route path="/movies/upcoming" element={<Movie />} />
-        <Route path="/movies/top-rated" element={<Movie />} />
-        <Route path="/tv/popular" element={<TVShows />} />
-        <Route path="/tv/airing-today" element={<TVShows />} />
-        <Route path="/tv/on-the-air" element={<TVShows />} />
-        <Route path="/tv/top-rated" element={<TVShows />} />
-        <Route path="/search/:category" element={<Search />} />{" "}
+
+        {/*Movie Routes*/}
+        {moviesRoute.map((route) => (
+          <Route key={route} path={`/${route}`} element={<Movie />} />
+        ))}
+
+        {/*Tv Routes*/}
+        {tvShowsRoute.map((route) => (
+          <Route key={route} path={`/${route}`} element={<TVShows />} />
+        ))}
+
+        {/*Search Routes*/}
+        <Route path="/search/:category" element={<Search />} />
         <Route path="/search" element={<Search />} />
+
+        {/*People Routes*/}
         <Route path="/people/popular-people" element={<Peoples />} />
       </Routes>
       <Footer />
